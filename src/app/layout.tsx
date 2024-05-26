@@ -6,25 +6,25 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "NuNa's Shop",
-  description: "The go-to shop for all your newborn's needs.",
+	title: "NuNa's Shop",
+	description: "The go-to shop for all your newborn's needs.",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={cn(
-          "bg-background min-h-screen font-sans antialiased",
-          inter.variable
-        )}
-      >
-        {children}
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body
+				className={cn(
+					"bg-background min-h-screen font-sans antialiased",
+					inter.variable
+				)}
+			>
+				{children}
+			</body>
+		</html>
+	);
 }
