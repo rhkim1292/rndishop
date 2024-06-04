@@ -26,7 +26,7 @@ async function getProductData() {
 		db.product.count({ where: { isAvailableForPurchase: false } }),
 	]);
 
-	return { activeCount: 0, inactiveCount: 0 };
+	return { activeCount, inactiveCount };
 }
 
 async function getUserData() {
