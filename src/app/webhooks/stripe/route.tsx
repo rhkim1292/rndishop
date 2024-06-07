@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 		});
 
 		await resend.emails.send({
-			from: `NuNa Shop Support <${process.env.SENDER_EMAIL}>`,
+			from: `NuNa's Shop Support <${process.env.SENDER_EMAIL}>`,
 			to: email,
 			subject: "Order Confirmation",
 			react: <h1>Hi</h1>,
