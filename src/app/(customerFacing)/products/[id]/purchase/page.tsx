@@ -19,8 +19,6 @@ export default async function PurchasePage({
 		metadata: { productId: product.id },
 	});
 
-	console.log("passed stripe payment intent");
-
 	if (paymentIntent.client_secret == null) {
 		throw Error("Stripe failed to create payment intent");
 	}

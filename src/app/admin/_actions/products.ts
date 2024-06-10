@@ -141,8 +141,6 @@ export async function deleteProduct(id: string) {
 
 	if (product === null) return notFound();
 
-	console.log("Entered deleteProduct function");
-
 	await del(product.filePath);
 	await del(product.imagePath);
 
