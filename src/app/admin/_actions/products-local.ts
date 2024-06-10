@@ -2,7 +2,7 @@
 
 import db from "@/db/db";
 import { z } from "zod";
-import { put, del } from "@vercel/blob";
+import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -27,25 +27,16 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
 	const data = result.data;
 
-	const filePath = `products/${data.file.name}`;
-	const fileBlob = await put(
-		filePath,
-		Buffer.from(await data.file.arrayBuffer()),
-		{
-			access: "public",
-		}
-	);
-	const fileURL = fileBlob.url;
+	await fs.mkdir("products", { recursive: true });
+	const filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
+	await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
 
-	const imagePath = `/products/${data.image.name}`;
-	const imageBlob = await put(
+	await fs.mkdir("public/products", { recursive: true });
+	const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
+	await fs.writeFile(
 		`public${imagePath}`,
-		Buffer.from(await data.image.arrayBuffer()),
-		{
-			access: "public",
-		}
+		Buffer.from(await data.image.arrayBuffer())
 	);
-	const imageURL = imageBlob.url;
 
 	await db.product.create({
 		data: {
@@ -53,8 +44,8 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
-			filePath: fileURL,
-			imagePath: imageURL,
+			filePath,
+			imagePath,
 		},
 	});
 
@@ -83,32 +74,21 @@ export async function updateProduct(
 
 	if (product === null) return notFound();
 
-	let fileURL, imageURL;
-
+	let filePath = product.filePath;
 	if (data.file != null && data.file.size > 0) {
-		await del(product.filePath);
-		const fileBlob = await put(
-			`products/${data.file.name}`,
-			Buffer.from(await data.file.arrayBuffer()),
-			{
-				access: "public",
-			}
-		);
-
-		fileURL = fileBlob.url;
+		await fs.unlink(product.filePath);
+		const filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
+		await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
 	}
 
+	let imagePath = product.imagePath;
 	if (data.image != null && data.image.size > 0) {
-		await del(product.imagePath);
-		const imageBlob = await put(
-			`public/products/${data.image.name}`,
-			Buffer.from(await data.image.arrayBuffer()),
-			{
-				access: "public",
-			}
+		await fs.unlink(`public${product.imagePath}`);
+		imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
+		await fs.writeFile(
+			`public${imagePath}`,
+			Buffer.from(await data.image.arrayBuffer())
 		);
-
-		imageURL = imageBlob.url;
 	}
 
 	await db.product.update({
@@ -117,8 +97,8 @@ export async function updateProduct(
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
-			filePath: fileURL,
-			imagePath: imageURL,
+			filePath,
+			imagePath,
 		},
 	});
 
@@ -141,10 +121,8 @@ export async function deleteProduct(id: string) {
 
 	if (product === null) return notFound();
 
-	console.log("Entered deleteProduct function");
-
-	await del(product.filePath);
-	await del(product.imagePath);
+	await fs.unlink(product.filePath);
+	await fs.unlink(`public${product.imagePath}`);
 
 	revalidatePath("/");
 	revalidatePath("/products");
