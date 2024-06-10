@@ -13,7 +13,7 @@
 		"email:win32": "copy .env .\\node_modules\\react-email && email dev --dir src/email --port 3001"
 	},
 	"dependencies": {
-		"@prisma/client": "^5.14.0",
+		"@prisma/client": "^5.15.0",
 		"@radix-ui/react-dropdown-menu": "^2.0.6",
 		"@radix-ui/react-label": "^2.0.2",
 		"@radix-ui/react-slot": "^1.0.2",
@@ -42,7 +42,7 @@
 		"eslint": "^8",
 		"eslint-config-next": "14.2.3",
 		"postcss": "^8",
-		"prisma": "^5.14.0",
+		"prisma": "^5.15.0",
 		"run-script-os": "^1.1.6",
 		"tailwindcss": "^3.4.1",
 		"ts-node": "^10.9.2",
