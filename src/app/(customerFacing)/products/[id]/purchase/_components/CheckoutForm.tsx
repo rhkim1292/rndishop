@@ -22,6 +22,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 
+export const dynamic = "force-dynamic";
+
 type CheckoutFormProps = {
 	product: {
 		id: string;
