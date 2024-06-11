@@ -13,7 +13,7 @@ export default async function SuccessPage({
 }: {
 	searchParams: { payment_intent: string };
 }) {
-	console.log(searchParams.payment_intent);
+	console.log(searchParams);
 	const paymentIntent = await stripe.paymentIntents.retrieve(
 		searchParams.payment_intent
 	);
