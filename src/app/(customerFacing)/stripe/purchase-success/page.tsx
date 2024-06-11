@@ -13,60 +13,66 @@ export default async function SuccessPage({
 }: {
 	searchParams: { payment_intent: string };
 }) {
-	console.log(searchParams);
-	const paymentIntent = await stripe.paymentIntents.retrieve(
-		searchParams.payment_intent
-	);
+	if (!searchParams || !searchParams.payment_intent) return notFound();
 
-	if (paymentIntent.metadata.productId == null) return notFound();
+	try {
+		const paymentIntent = await stripe.paymentIntents.retrieve(
+			searchParams.payment_intent
+		);
 
-	const product = await db.product.findUnique({
-		where: { id: paymentIntent.metadata.productId },
-	});
+		if (paymentIntent.metadata.productId == null) return notFound();
 
-	if (product == null) return notFound();
+		const product = await db.product.findUnique({
+			where: { id: paymentIntent.metadata.productId },
+		});
 
-	const isSuccess = paymentIntent.status === "succeeded";
+		if (product == null) return notFound();
 
-	return (
-		<div className="max-w-5xl w-full mx-auto space-y-8">
-			<h1 className="text-4xl font-bold">
-				{isSuccess ? "Success!" : "Error!"}
-			</h1>
-			<div className="flex gap-4 items-center">
-				<div className="aspect-video flex-shrink-0 w-1/3 relative">
-					<Image
-						src={product.imagePath}
-						fill
-						alt={product.name}
-						className="object-cover"
-					/>
-				</div>
-				<div>
-					<div className="text-lg">
-						{formatCurrency(product.priceInCents / 100)}
+		const isSuccess = paymentIntent.status === "succeeded";
+
+		return (
+			<div className="max-w-5xl w-full mx-auto space-y-8">
+				<h1 className="text-4xl font-bold">
+					{isSuccess ? "Success!" : "Error!"}
+				</h1>
+				<div className="flex gap-4 items-center">
+					<div className="aspect-video flex-shrink-0 w-1/3 relative">
+						<Image
+							src={product.imagePath}
+							fill
+							alt={product.name}
+							className="object-cover"
+						/>
 					</div>
-					<h1 className="text-2xl font-bold">{product.name}</h1>
-					<div className="line-clamp-3 text-muted-foreground">
-						{product.description}
+					<div>
+						<div className="text-lg">
+							{formatCurrency(product.priceInCents / 100)}
+						</div>
+						<h1 className="text-2xl font-bold">{product.name}</h1>
+						<div className="line-clamp-3 text-muted-foreground">
+							{product.description}
+						</div>
+						<Button className="mt-4" size="lg" asChild>
+							{isSuccess ? (
+								<a
+									href={`/products/download/${await createDownloadVerification(
+										product.id
+									)}`}
+								>
+									Download
+								</a>
+							) : (
+								<Link href={`/products/${product.id}/purchase`}>Try Again</Link>
+							)}
+						</Button>
 					</div>
-					<Button className="mt-4" size="lg" asChild>
-						{isSuccess ? (
-							<a
-								href={`/products/download/${await createDownloadVerification(
-									product.id
-								)}`}
-							>
-								Download
-							</a>
-						) : (
-							<Link href={`/products/${product.id}/purchase`}>Try Again</Link>
-						)}
-					</Button>
 				</div>
 			</div>
-		</div>
-	);
+		);
+	} catch (error) {
+		console.error("Error retrieving payment intent:", error);
+		return notFound();
+	}
 }
 
 async function createDownloadVerification(productId: string) {
