@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import db from "@/db/db";
 import { formatCurrency } from "@/lib/formatters";
@@ -6,18 +8,17 @@ import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
 export const dynamic = "force-dynamic";
 
-export default async function SuccessPage({
-	searchParams,
-}: {
-	searchParams: { payment_intent: string };
-}) {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
+export default async function SuccessPage() {
+	const searchParams = useSearchParams();
+	const paymentIntentParam = searchParams.get("payment_intent");
+
 	try {
 		const paymentIntent = await stripe.paymentIntents.retrieve(
-			searchParams.payment_intent
+			paymentIntentParam as string
 		);
 
 		if (paymentIntent.metadata.productId == null) return notFound();
