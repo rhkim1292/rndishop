@@ -1,6 +1,6 @@
 import db from "@/db/db";
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
+import { head } from "@vercel/blob";
 
 export async function GET(
 	req: NextRequest,
@@ -19,9 +19,13 @@ export async function GET(
 		);
 	}
 
-	const { size } = await fs.stat(data.product.filePath);
-	const file = await fs.readFile(data.product.filePath);
 	const extension = data.product.filePath.split(".").pop();
+	const blobDetails = await head(data.product.filePath);
+	const { downloadUrl } = blobDetails;
+	const res = await fetch(downloadUrl);
+	const blob = await res.blob();
+	const { size, type } = blob;
+	const file = await blob.arrayBuffer();
 
 	return new NextResponse(file, {
 		headers: {
