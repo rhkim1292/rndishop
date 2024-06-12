@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 		});
 
 		await resend.emails.send({
-			from: `NuNa's Shop Support <${process.env.SENDER_EMAIL}>`,
+			from: `rndi's Shop Support <${process.env.SENDER_EMAIL}>`,
 			to: email,
 			subject: "Order Confirmation",
 			react: (
