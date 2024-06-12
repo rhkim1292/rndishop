@@ -15,16 +15,10 @@ export async function POST(req: NextRequest) {
 	);
 
 	if (event.type === "charge.succeeded") {
-		console.log("Entering charge succeeded case");
 		const charge = event.data.object;
 		const productId = charge.metadata.productId;
 		const email = charge.billing_details.email;
 		const pricePaidInCents = charge.amount;
-
-		console.log("charge", charge);
-		console.log("productId", productId);
-		console.log("email", email);
-		console.log("pricePaidInCents", pricePaidInCents);
 
 		const product = await db.product.findUnique({ where: { id: productId } });
 		if (!product || !email) {
