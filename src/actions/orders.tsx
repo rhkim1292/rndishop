@@ -62,7 +62,7 @@ export async function emailOrderHistory(
 	});
 
 	const data = await resend.emails.send({
-		from: `NuNa's Shop Support <${process.env.SENDER_EMAIL}>`,
+		from: `rndi's Shop Support <${process.env.SENDER_EMAIL}>`,
 		to: user.email,
 		subject: "Order History",
 		react: <OrderHistoryEmail orders={await Promise.all(orders)} />,
